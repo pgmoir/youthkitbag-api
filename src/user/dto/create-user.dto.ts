@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator';
 import { patterns } from 'src/utils/patterns.util';
 
 export class CreateUserDto {
@@ -17,10 +23,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   @Matches(patterns.password, {
     message:
-      'Password must be at least 8 characters and include at least one lowercase character, one uppercase character, one number and one special character',
+      'password must be at least 8 characters and include at least one lowercase character, one uppercase character, one number and one special character',
   })
   password: string;
 
+  @IsOptional()
   @IsString()
-  postcode: string;
+  postcode?: string;
 }

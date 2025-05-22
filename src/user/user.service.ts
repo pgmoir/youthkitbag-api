@@ -1,35 +1,50 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { HashService } from 'src/services/hash/hash.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User, UserDocument } from './user.schema';
+import { User } from './interfaces/user.interface';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @Inject('USER_MODEL') private readonly userModel: Model<User>,
     private hashService: HashService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await this.hashService.hash(createUserDto.password);
 
-    const { _id } = await this.userModel.create({
+    const user = await this.userModel.create({
       ...createUserDto,
       password: hashedPassword,
     });
 
-    return this.findOne(_id.toString());
+    return this.findOne(user._id as string);
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+    return this.userModel
+      .find()
+      .select({
+        password: 0,
+        passwordLocked: 0,
+        passwordAttempts: 0,
+        __v: 0,
+      })
+      .exec();
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).exec();
+    const user = await this.userModel
+      .findById(id)
+      .select({
+        password: 0,
+        passwordLocked: 0,
+        passwordAttempts: 0,
+        __v: 0,
+      })
+      .exec();
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -39,14 +54,17 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    if (updateUserDto.password) {
-      updateUserDto.password = await this.hashService.hash(
-        updateUserDto.password,
-      );
+    const { password, ...rest } = updateUserDto;
+
+    let updatePassword = {};
+    if (password) {
+      const hashedPassword = await this.hashService.hash(password);
+      updatePassword = { password: hashedPassword };
     }
 
     await this.userModel.findByIdAndUpdate(id, {
-      ...updateUserDto,
+      ...rest,
+      ...updatePassword,
     });
 
     return this.findOne(id);

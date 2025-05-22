@@ -10,14 +10,14 @@ import { patterns } from 'src/utils/patterns.util';
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  readonly firstName: string;
 
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  readonly lastName: string;
 
   @IsEmail()
-  email: string;
+  readonly email: string;
 
   @IsString()
   @IsNotEmpty()
@@ -25,9 +25,9 @@ export class CreateUserDto {
     message:
       'password must be at least 8 characters and include at least one lowercase character, one uppercase character, one number and one special character',
   })
-  password: string;
+  readonly password: string;
 
   @IsOptional()
   @IsString()
-  postcode?: string;
+  readonly postcode?: string;
 }

@@ -4,7 +4,12 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  DocumentBuilder,
+  SwaggerCustomOptions,
+  SwaggerDocumentOptions,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -18,8 +23,15 @@ async function bootstrap() {
     .setDescription('Authenticated backend for Youthkitbag Application')
     .setVersion('1.0.0')
     .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, documentFactory);
+  const documentOptions: SwaggerDocumentOptions = {
+    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+  };
+  const documentFactory = () =>
+    SwaggerModule.createDocument(app, config, documentOptions);
+  const customOptions: SwaggerCustomOptions = {
+    explorer: false,
+  };
+  SwaggerModule.setup('api', app, documentFactory, customOptions);
 
   app.enableCors();
   app.setGlobalPrefix('api');

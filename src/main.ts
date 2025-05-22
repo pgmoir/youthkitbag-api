@@ -25,7 +25,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const configService = app.get(ConfigService);
-  const port = (process.env.PORT || configService.get<number>('PORT')) ?? 3000;
+  const port = configService.get<number>('PORT') ?? 3000;
 
   await app.listen(port, () => {
     console.log(`Listening on port: ${port}`);

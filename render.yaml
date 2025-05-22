@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: fastify-api
-    runtime: node
-    branch: main
-    buildCommand: 'npm install && npm run build'
-    startCommand: 'npm start'
-    plan: free

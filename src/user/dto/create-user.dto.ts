@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
@@ -17,6 +18,7 @@ export class CreateUserDto {
   readonly lastName: string;
 
   @IsEmail()
+  @IsNotEmpty()
   readonly email: string;
 
   @IsString()
@@ -25,9 +27,10 @@ export class CreateUserDto {
     message:
       'password must be at least 8 characters and include at least one lowercase character, one uppercase character, one number and one special character',
   })
+  @ApiProperty()
   readonly password: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   readonly postcode?: string;
 }

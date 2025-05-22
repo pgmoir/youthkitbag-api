@@ -77,7 +77,7 @@ export class UserService {
       throw new NotFoundException('User not found to be deleted');
     }
 
-    return result;
+    return { _id: id, isDeleted: true };
   }
 
   async validatePassword(id: string, password: string) {
@@ -87,6 +87,9 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    return this.hashService.compare(password, user.password);
+    return {
+      _id: id,
+      isValid: this.hashService.compare(password, user.password),
+    };
   }
 }

@@ -25,6 +25,11 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @Get('check/:id/:password')
+  checkPassword(@Param('id') id: string, @Param('password') password: string) {
+    return this.userService.validatePassword(id, password);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id);

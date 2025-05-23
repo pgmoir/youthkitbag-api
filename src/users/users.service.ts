@@ -28,7 +28,7 @@ export class UsersService {
       password: hashedPassword,
     });
 
-    return this.findOne(user._id as string);
+    return this.findOne(user._id);
   }
 
   async findAll(): Promise<User[]> {
@@ -75,16 +75,19 @@ export class UsersService {
     return { _id: id, isDeleted: true };
   }
 
-  async validatePassword(id: string, password: string) {
-    const user = await this.userModel.findById(id).select({ password: 1 });
+  async validatePassword(email: string, password: string) {
+    const user = await this.userModel
+      .findOne({ email: email.toLowerCase() })
+      .select({ _id: 1, password: 1 })
+      .exec();
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
     return {
-      _id: id,
-      isValid: this.hashService.compare(password, user.password),
+      _id: user._id,
+      isValid: await this.hashService.compare(password, user.password),
     };
   }
 }

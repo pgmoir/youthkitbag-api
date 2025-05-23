@@ -15,8 +15,8 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
-import { DeletedResponseDto } from '../dtos/deleted-response.dto';
-import { ValidResponseDto } from '../dtos/valid-response.dto';
+import { DeletedResponseDto } from '../dto/deleted-response.dto';
+import { ValidResponseDto } from '../dto/valid-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';

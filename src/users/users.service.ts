@@ -8,9 +8,16 @@ import { User } from './interfaces/user.interface';
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject('USER_MODEL') private readonly userModel: Model<User>,
+    @Inject('USERS_MODEL') private readonly userModel: Model<User>,
     private hashService: HashService,
   ) {}
+
+  private excludeFields = {
+    password: 0,
+    passwordLocked: 0,
+    passwordAttempts: 0,
+    __v: 0,
+  };
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await this.hashService.hash(createUserDto.password);
@@ -24,26 +31,13 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel
-      .find()
-      .select({
-        password: 0,
-        passwordLocked: 0,
-        passwordAttempts: 0,
-        __v: 0,
-      })
-      .exec();
+    return this.userModel.find().select(this.excludeFields).exec();
   }
 
   async findOne(id: string): Promise<User> {
     const user = await this.userModel
       .findById(id)
-      .select({
-        password: 0,
-        passwordLocked: 0,
-        passwordAttempts: 0,
-        __v: 0,
-      })
+      .select(this.excludeFields)
       .exec();
 
     if (!user) {

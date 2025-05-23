@@ -1,19 +1,18 @@
-import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
+import { JwtService } from '@nestjs/jwt';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
-
-import { NotFoundException } from '@nestjs/common';
 import { USERS_MODEL } from '../consts/models.const';
 import { HashService } from '../services/hash/hash.service';
-import { User } from './interfaces/user.interface';
-import { UserSchema } from './schemas/user.schema';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
+import { User } from '../users/interfaces/user.interface';
+import { UserSchema } from '../users/schemas/user.schema';
+import { UsersService } from '../users/users.service';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 
-describe('UsersController (e2e)', () => {
-  let controller: UsersController;
-  let usersService: UsersService;
+describe('AuthController (e2e)', () => {
+  let controller: AuthController;
   let mongod: MongoMemoryServer;
   let connection: Connection;
 
@@ -23,9 +22,11 @@ describe('UsersController (e2e)', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [MongooseModule.forRoot(uri)],
-      controllers: [UsersController],
+      controllers: [AuthController],
       providers: [
+        AuthService,
         UsersService,
+        JwtService,
         HashService,
         {
           provide: USERS_MODEL,
@@ -36,9 +37,8 @@ describe('UsersController (e2e)', () => {
       ],
     }).compile();
 
-    controller = module.get<UsersController>(UsersController);
+    controller = module.get<AuthController>(AuthController);
     connection = module.get(getConnectionToken());
-    usersService = module.get<UsersService>(UsersService);
   });
 
   afterAll(async () => {
@@ -54,25 +54,5 @@ describe('UsersController (e2e)', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-  });
-
-  it('should throw NotFoundException if user not found', async () => {
-    await expect(
-      controller.findOne('000000000000000000000000'),
-    ).rejects.toThrow(NotFoundException);
-  });
-
-  it('should update a user', async () => {
-    const created = await usersService.create({
-      firstName: 'John',
-      lastName: 'Smith',
-      password: 'abCD12£$',
-      email: 'johnSmith@test.co',
-    });
-    const updated = await controller.update(created._id, {
-      email: 'johnSmith@test.co.uk',
-    });
-
-    expect(updated.email).toBe('johnsmith@test.co.uk');
   });
 });

@@ -1,7 +1,7 @@
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Connection, Model } from 'mongoose';
+import { Connection, Model, Types } from 'mongoose';
 
 import { NotFoundException } from '@nestjs/common';
 import { KITBAGS_MODEL } from '../consts/models.const';
@@ -56,8 +56,9 @@ describe('KitbagsService (e2e)', () => {
   });
 
   it('should create a kitbag and return it', async () => {
+    const userId = new Types.ObjectId().toString();
     const dto: CreateKitbagDto = { name: 'My Kitbag' };
-    const result = await service.create(dto);
+    const result = await service.create(dto, userId);
 
     expect(result).toHaveProperty('_id');
     expect(result.name).toBe('My Kitbag');
@@ -65,45 +66,59 @@ describe('KitbagsService (e2e)', () => {
   });
 
   it('should return all kitbags', async () => {
-    await service.create({ name: 'First' });
-    await service.create({ name: 'Second' });
+    const userId = new Types.ObjectId().toString();
+    await service.create({ name: 'First' }, userId);
+    await service.create({ name: 'Second' }, userId);
 
-    const result = await service.findAll();
+    const otherUserId = new Types.ObjectId().toString();
+    await service.create({ name: 'Third' }, otherUserId);
+    await service.create({ name: 'Fourth' }, otherUserId);
+
+    const result = await service.findAll(userId);
     expect(result.length).toBe(2);
   });
 
   it('should return a kitbag by id', async () => {
-    const created = await service.create({ name: 'Lookup Bag' });
-    const result = await service.findOne(created._id);
+    const userId = new Types.ObjectId().toString();
+    const created = await service.create({ name: 'Lookup Bag' }, userId);
+    const result = await service.findOne(created._id, userId);
 
     expect(result.name).toBe('Lookup Bag');
   });
 
   it('should throw NotFoundException if kitbag not found', async () => {
-    await expect(service.findOne('000000000000000000000000')).rejects.toThrow(
-      NotFoundException,
-    );
+    const userId = new Types.ObjectId().toString();
+    await expect(
+      service.findOne('000000000000000000000000', userId),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('should update a kitbag', async () => {
-    const created = await service.create({ name: 'To Update' });
-    const updated = await service.update(created._id, {
-      name: 'Updated Bag',
-    });
+    const userId = new Types.ObjectId().toString();
+    const created = await service.create({ name: 'To Update' }, userId);
+    const updated = await service.update(
+      created._id,
+      {
+        name: 'Updated Bag',
+      },
+      userId,
+    );
 
     expect(updated.name).toBe('Updated Bag');
   });
 
   it('should delete a kitbag', async () => {
-    const created = await service.create({ name: 'To Delete' });
-    const result = await service.remove(created._id);
+    const userId = new Types.ObjectId().toString();
+    const created = await service.create({ name: 'To Delete' }, userId);
+    const result = await service.remove(created._id, userId);
 
     expect(result).toEqual({ _id: created._id, isDeleted: true });
   });
 
   it('should throw NotFoundException if delete fails', async () => {
-    await expect(service.remove('000000000000000000000000')).rejects.toThrow(
-      NotFoundException,
-    );
+    const userId = new Types.ObjectId().toString();
+    await expect(
+      service.remove('000000000000000000000000', userId),
+    ).rejects.toThrow(NotFoundException);
   });
 });

@@ -1,7 +1,7 @@
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Connection } from 'mongoose';
+import { Connection, Types } from 'mongoose';
 
 import { NotFoundException } from '@nestjs/common';
 import { KITBAGS_MODEL } from '../consts/models.const';
@@ -56,8 +56,9 @@ describe('KitbagsController (e2e)', () => {
   });
 
   it('should create a kitbag and return it', async () => {
+    const userId = new Types.ObjectId().toString();
     const dto: CreateKitbagDto = { name: 'My Kitbag' };
-    const result = await controller.create(dto);
+    const result = await controller.create(userId, dto);
 
     expect(result).toHaveProperty('_id');
     expect(result.name).toBe('My Kitbag');
@@ -66,29 +67,37 @@ describe('KitbagsController (e2e)', () => {
   });
 
   it('should return all kitbags', async () => {
-    await controller.create({ name: 'First' });
-    await controller.create({ name: 'Second' });
+    const userId = new Types.ObjectId().toString();
+    await controller.create(userId, { name: 'First' });
+    await controller.create(userId, { name: 'Second' });
 
-    const result = await controller.findAll();
+    const otherUserId = new Types.ObjectId().toString();
+    await controller.create(otherUserId, { name: 'Third' });
+    await controller.create(otherUserId, { name: 'Fourth' });
+
+    const result = await controller.findAll(userId);
     expect(result.length).toBe(2);
   });
 
   it('should return a kitbag by id', async () => {
-    const created = await controller.create({ name: 'Lookup Bag' });
-    const result = await controller.findOne(created._id);
+    const userId = new Types.ObjectId().toString();
+    const created = await controller.create(userId, { name: 'Lookup Bag' });
+    const result = await controller.findOne(userId, created._id);
 
     expect(result.name).toBe('Lookup Bag');
   });
 
   it('should throw NotFoundException if kitbag not found', async () => {
+    const userId = new Types.ObjectId().toString();
     await expect(
-      controller.findOne('000000000000000000000000'),
+      controller.findOne(userId, '000000000000000000000000'),
     ).rejects.toThrow(NotFoundException);
   });
 
   it('should update a kitbag', async () => {
-    const created = await controller.create({ name: 'To Update' });
-    const updated = await controller.update(created._id, {
+    const userId = new Types.ObjectId().toString();
+    const created = await controller.create(userId, { name: 'To Update' });
+    const updated = await controller.update(userId, created._id, {
       name: 'Updated Bag',
     });
 
@@ -96,15 +105,17 @@ describe('KitbagsController (e2e)', () => {
   });
 
   it('should delete a kitbag', async () => {
-    const created = await controller.create({ name: 'To Delete' });
-    const result = await controller.remove(created._id);
+    const userId = new Types.ObjectId().toString();
+    const created = await controller.create(userId, { name: 'To Delete' });
+    const result = await controller.remove(userId, created._id);
 
     expect(result).toEqual({ _id: created._id, isDeleted: true });
   });
 
   it('should throw NotFoundException if delete fails', async () => {
-    await expect(controller.remove('000000000000000000000000')).rejects.toThrow(
-      NotFoundException,
-    );
+    const userId = new Types.ObjectId().toString();
+    await expect(
+      controller.remove(userId, '000000000000000000000000'),
+    ).rejects.toThrow(NotFoundException);
   });
 });

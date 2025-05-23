@@ -13,41 +13,49 @@ export class KitbagsService {
     private spaceService: SpaceService,
   ) {}
 
-  async create(createKitbagDto: CreateKitbagDto): Promise<Kitbag> {
+  async create(
+    createKitbagDto: CreateKitbagDto,
+    creator: string,
+  ): Promise<Kitbag> {
     const space = this.spaceService.convert(createKitbagDto.name);
 
     const kitbag = await this.kitbagModel.create({
       ...createKitbagDto,
       space,
+      creator,
     });
 
-    return this.findOne(kitbag._id);
+    return this.findOne(kitbag._id, creator);
   }
 
-  async findAll(): Promise<Kitbag[]> {
-    return this.kitbagModel.find().exec();
+  async findAll(creator: string): Promise<Kitbag[]> {
+    return this.kitbagModel.find({ creator }).exec();
   }
 
-  async findOne(id: string): Promise<Kitbag> {
+  async findOne(id: string, creator: string): Promise<Kitbag> {
     const kitbag = await this.kitbagModel.findById(id).exec();
 
-    if (!kitbag) {
+    if (!kitbag || kitbag.creator.toString() !== creator) {
       throw new NotFoundException('Kitbag not found');
     }
 
     return kitbag;
   }
 
-  async update(id: string, updateKitbagDto: UpdateKitbagDto): Promise<Kitbag> {
+  async update(
+    id: string,
+    updateKitbagDto: UpdateKitbagDto,
+    creator: string,
+  ): Promise<Kitbag> {
     await this.kitbagModel.findByIdAndUpdate(id, {
       ...updateKitbagDto,
     });
 
-    return this.findOne(id);
+    return this.findOne(id, creator);
   }
 
-  async remove(id: string) {
-    const result = await this.kitbagModel.deleteOne({ _id: id });
+  async remove(id: string, creator: string) {
+    const result = await this.kitbagModel.deleteOne({ _id: id, creator });
 
     if (result.deletedCount === 0) {
       throw new NotFoundException('Kitbag not found to be deleted');

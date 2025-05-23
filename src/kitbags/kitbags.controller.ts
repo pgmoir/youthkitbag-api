@@ -15,6 +15,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
+import { UserId } from '../decorators/user.decorator';
 import { DeletedResponseDto } from '../dto/deleted-response.dto';
 import { CreateKitbagDto } from './dto/create-kitbag.dto';
 import { KitbagResponseDto } from './dto/kitbag-response.dto';
@@ -32,8 +33,11 @@ export class KitbagsController {
     description: 'Kitbag created successfully',
   })
   @ApiBadRequestResponse({ description: 'Invalid input' })
-  create(@Body(ValidationPipe) createKitbagDto: CreateKitbagDto) {
-    return this.kitbagsService.create(createKitbagDto);
+  create(
+    @UserId() userId: string,
+    @Body(ValidationPipe) createKitbagDto: CreateKitbagDto,
+  ) {
+    return this.kitbagsService.create(createKitbagDto, userId);
   }
 
   @Get()
@@ -41,15 +45,15 @@ export class KitbagsController {
     type: [KitbagResponseDto],
     description: 'Kitbags found',
   })
-  findAll() {
-    return this.kitbagsService.findAll();
+  findAll(@UserId() userId: string) {
+    return this.kitbagsService.findAll(userId);
   }
 
   @Get(':id')
   @ApiOkResponse({ type: KitbagResponseDto, description: 'Kitbag found' })
   @ApiNotFoundResponse({ description: 'Kitbag not found' })
-  findOne(@Param('id') id: string) {
-    return this.kitbagsService.findOne(id);
+  findOne(@UserId() userId: string, @Param('id') id: string) {
+    return this.kitbagsService.findOne(id, userId);
   }
 
   @Patch(':id')
@@ -57,16 +61,17 @@ export class KitbagsController {
   @ApiOkResponse({ type: KitbagResponseDto, description: 'Kitbag updated' })
   @ApiNotFoundResponse({ description: 'Kitbag not found' })
   update(
+    @UserId() userId: string,
     @Param('id') id: string,
     @Body(ValidationPipe) updateKitbagDto: UpdateKitbagDto,
   ) {
-    return this.kitbagsService.update(id, updateKitbagDto);
+    return this.kitbagsService.update(id, updateKitbagDto, userId);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: DeletedResponseDto, description: 'Kitbag deleted' })
   @ApiNotFoundResponse({ description: 'Kitbag not found' })
-  remove(@Param('id') id: string) {
-    return this.kitbagsService.remove(id);
+  remove(@UserId() userId: string, @Param('id') id: string) {
+    return this.kitbagsService.remove(id, userId);
   }
 }

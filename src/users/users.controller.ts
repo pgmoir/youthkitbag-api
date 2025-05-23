@@ -1,23 +1,6 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  ValidationPipe,
-} from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-} from '@nestjs/swagger';
-import { DeletedResponseDto } from '../dto/deleted-response.dto';
-import { ValidResponseDto } from '../dto/valid-response.dto';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Body, Controller, Get, Patch, ValidationPipe } from '@nestjs/common';
+import { ApiBody, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
+import { UserId } from '../decorators/user.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UsersService } from './users.service';
@@ -26,58 +9,21 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  @ApiBody({ type: CreateUserDto })
-  @ApiCreatedResponse({
-    type: UserResponseDto,
-    description: 'User created successfully',
-  })
-  @ApiBadRequestResponse({ description: 'Invalid input' })
-  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
-  @Get()
-  @ApiOkResponse({
-    type: [UserResponseDto],
-    description: 'Users found',
-  })
-  findAll() {
-    return this.usersService.findAll();
-  }
-
-  @Get('check/:id/:password')
-  @ApiOkResponse({
-    type: ValidResponseDto,
-    description: 'User password validated',
-  })
-  @ApiNotFoundResponse({ description: 'User not found' })
-  checkPassword(@Param('id') id: string, @Param('password') password: string) {
-    return this.usersService.validatePassword(id, password);
-  }
-
-  @Get(':id')
+  @Get('')
   @ApiOkResponse({ type: UserResponseDto, description: 'User found' })
   @ApiNotFoundResponse({ description: 'User not found' })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  findOne(@UserId() userId: string) {
+    return this.usersService.findOne(userId);
   }
 
-  @Patch(':id')
+  @Patch('')
   @ApiBody({ type: UpdateUserDto })
   @ApiOkResponse({ type: UserResponseDto, description: 'User updated' })
   @ApiNotFoundResponse({ description: 'User not found' })
   update(
-    @Param('id') id: string,
+    @UserId() userId: string,
     @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.update(id, updateUserDto);
-  }
-
-  @Delete(':id')
-  @ApiOkResponse({ type: DeletedResponseDto, description: 'User deleted' })
-  @ApiNotFoundResponse({ description: 'User not found' })
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+    return this.usersService.update(userId, updateUserDto);
   }
 }

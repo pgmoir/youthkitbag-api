@@ -8,4 +8,5 @@ export interface Kitbag extends Document {
   readonly description?: string;
   readonly activitys?: string[];
   readonly state: KitbagStates;
+  readonly creator: string;
 }

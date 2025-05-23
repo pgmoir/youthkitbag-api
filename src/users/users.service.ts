@@ -31,10 +31,6 @@ export class UsersService {
     return this.findOne(user._id);
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().select(this.excludeFields).exec();
-  }
-
   async findOne(id: string): Promise<User> {
     const user = await this.userModel
       .findById(id)
@@ -63,16 +59,6 @@ export class UsersService {
     });
 
     return this.findOne(id);
-  }
-
-  async remove(id: string) {
-    const result = await this.userModel.deleteOne({ _id: id });
-
-    if (result.deletedCount === 0) {
-      throw new NotFoundException('User not found to be deleted');
-    }
-
-    return { _id: id, isDeleted: true };
   }
 
   async validatePassword(email: string, password: string) {

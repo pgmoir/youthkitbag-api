@@ -23,11 +23,11 @@ export const KitbagSchema = new mongoose.Schema(
         lowercase: true,
       },
     ],
-    // creator: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'User',
-    //   required: true,
-    // },
+    creator: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     state: {
       type: String,
       enum: [

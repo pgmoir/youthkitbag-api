@@ -72,24 +72,6 @@ describe('UserService (e2e)', () => {
     expectNoProperty(result, 'password');
   });
 
-  it('should return all users', async () => {
-    await service.create({
-      firstName: 'John',
-      lastName: 'Smith',
-      password: 'abCD12£$',
-      email: 'johnSmith@test.co',
-    });
-    await service.create({
-      firstName: 'Jenny',
-      lastName: 'brown',
-      password: 'lkJH09*&',
-      email: 'jennYBROwn@test.co',
-    });
-
-    const result = await service.findAll();
-    expect(result.length).toBe(2);
-  });
-
   it('should return a user by id', async () => {
     const created = await service.create({
       firstName: 'John',
@@ -120,23 +102,5 @@ describe('UserService (e2e)', () => {
     });
 
     expect(updated.email).toBe('johnsmith@test.co.uk');
-  });
-
-  it('should delete a user', async () => {
-    const created = await service.create({
-      firstName: 'John',
-      lastName: 'Smith',
-      password: 'abCD12£$',
-      email: 'johnSmith@test.co',
-    });
-    const result = await service.remove(created._id);
-
-    expect(result).toEqual({ _id: created._id, isDeleted: true });
-  });
-
-  it('should throw NotFoundException if delete fails', async () => {
-    await expect(service.remove('000000000000000000000000')).rejects.toThrow(
-      NotFoundException,
-    );
   });
 });

@@ -15,16 +15,16 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
+import { DeletedResponseDto } from '../dtos/deleted-response.dto';
+import { ValidResponseDto } from '../dtos/valid-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserDeletedResponseDto } from './dto/user-deleted-response.dto';
 import { UserResponseDto } from './dto/user-response.dto';
-import { UserValidatedResponseDto } from './dto/user-validated-response.dto';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 
-@Controller('user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@Controller('users')
+export class UsersController {
+  constructor(private readonly userService: UsersService) {}
 
   @Post()
   @ApiBody({ type: CreateUserDto })
@@ -48,7 +48,7 @@ export class UserController {
 
   @Get('check/:id/:password')
   @ApiOkResponse({
-    type: UserValidatedResponseDto,
+    type: ValidResponseDto,
     description: 'User password validated',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
@@ -78,7 +78,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  @ApiOkResponse({ type: UserDeletedResponseDto, description: 'User deleted' })
+  @ApiOkResponse({ type: DeletedResponseDto, description: 'User deleted' })
   @ApiNotFoundResponse({ description: 'User not found' })
   async remove(@Param('id') id: string) {
     return this.userService.remove(id);

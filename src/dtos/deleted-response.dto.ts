@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserValidatedResponseDto {
+export class DeletedResponseDto {
   @ApiProperty()
   _id: string;
 
   @ApiProperty()
-  isValid: boolean;
+  isDeleted: boolean;
 }

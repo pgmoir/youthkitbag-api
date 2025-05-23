@@ -15,7 +15,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
-import { DeletedResponseDto } from 'src/dtos/deleted-response.dto';
+import { DeletedResponseDto } from '../dtos/deleted-response.dto';
 import { CreateKitbagDto } from './dto/create-kitbag.dto';
 import { KitbagResponseDto } from './dto/kitbag-response.dto';
 import { UpdateKitbagDto } from './dto/update-kitbag.dto';

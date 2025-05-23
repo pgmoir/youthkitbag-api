@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { KitbagStates } from 'src/enums/kitbagStates.enum';
+import { KitbagStates } from '../../enums/kitbagStates.enum';
 
 export const KitbagSchema = new mongoose.Schema(
   {

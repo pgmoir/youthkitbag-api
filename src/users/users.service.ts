@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { HashService } from 'src/services/hash/hash.service';
+import { USERS_MODEL } from '../consts/models.const';
+import { HashService } from '../services/hash/hash.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './interfaces/user.interface';
@@ -8,7 +9,7 @@ import { User } from './interfaces/user.interface';
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject('USERS_MODEL') private readonly userModel: Model<User>,
+    @Inject(USERS_MODEL) private readonly userModel: Model<User>,
     private hashService: HashService,
   ) {}
 

@@ -6,7 +6,7 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
-import { patterns } from 'src/utils/patterns.util';
+import { patterns } from '../../utils/patterns.util';
 
 export class CreateUserDto {
   @IsString()

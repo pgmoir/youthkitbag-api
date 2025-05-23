@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { SpaceService } from 'src/services/space/space.service';
+import { KITBAGS_MODEL } from '../consts/models.const';
+import { SpaceService } from '../services/space/space.service';
 import { CreateKitbagDto } from './dto/create-kitbag.dto';
 import { UpdateKitbagDto } from './dto/update-kitbag.dto';
 import { Kitbag } from './interfaces/kitbag.interface';
@@ -8,7 +9,7 @@ import { Kitbag } from './interfaces/kitbag.interface';
 @Injectable()
 export class KitbagsService {
   constructor(
-    @Inject('KITBAGS_MODEL') private readonly kitbagModel: Model<Kitbag>,
+    @Inject(KITBAGS_MODEL) private readonly kitbagModel: Model<Kitbag>,
     private spaceService: SpaceService,
   ) {}
 
@@ -20,7 +21,7 @@ export class KitbagsService {
       space,
     });
 
-    return this.findOne(kitbag._id as string);
+    return this.findOne(kitbag._id);
   }
 
   async findAll(): Promise<Kitbag[]> {

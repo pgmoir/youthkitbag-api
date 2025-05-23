@@ -24,7 +24,7 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @ApiBody({ type: CreateUserDto })
@@ -33,8 +33,8 @@ export class UsersController {
     description: 'User created successfully',
   })
   @ApiBadRequestResponse({ description: 'Invalid input' })
-  async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
   @Get()
@@ -42,8 +42,8 @@ export class UsersController {
     type: [UserResponseDto],
     description: 'Users found',
   })
-  async findAll() {
-    return this.userService.findAll();
+  findAll() {
+    return this.usersService.findAll();
   }
 
   @Get('check/:id/:password')
@@ -52,35 +52,32 @@ export class UsersController {
     description: 'User password validated',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async checkPassword(
-    @Param('id') id: string,
-    @Param('password') password: string,
-  ) {
-    return this.userService.validatePassword(id, password);
+  checkPassword(@Param('id') id: string, @Param('password') password: string) {
+    return this.usersService.validatePassword(id, password);
   }
 
   @Get(':id')
   @ApiOkResponse({ type: UserResponseDto, description: 'User found' })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @ApiBody({ type: UpdateUserDto })
   @ApiOkResponse({ type: UserResponseDto, description: 'User updated' })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async update(
+  update(
     @Param('id') id: string,
     @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: DeletedResponseDto, description: 'User deleted' })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(id);
   }
 }

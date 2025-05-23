@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-import { LocationSchema } from 'src/schemas/location.schema';
+import * as mongoose from 'mongoose';
 
 export const UserSchema = new mongoose.Schema(
   {
@@ -37,9 +36,6 @@ export const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: '',
-    },
-    location: {
-      type: LocationSchema,
     },
   },
   { timestamps: true },
